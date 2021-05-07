@@ -2,10 +2,43 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>GitHub Pages</title>
+  <title>Unofficial 詰めキューブ Ranking</title>
 </head>
 <body>
+<h1>Unofficial 詰めキューブ Ranking</h1>
+
+<label for="is_virtual">Virtual Mode</label>
+<input type="checkbox" id="is_virtual" name="is_virtual" />
+<br />
+<label>手数
+  <select id="te" name="te">
+    <option value="4">4手</option>
+    <option value="5">5手</option>
+    <option value="6">6手</option>
+    <option value="7">7手</option>
+    <option value="8" selected>8手</option>
+  </select>
+</label>
+
 <script>
+    let isVirtual = false;
+    let te = 8;
+
+    const checkboxIsVirtual = document.getElementById("is_virtual");
+    checkboxIsVirtual.addEventListener("change", (ev) => {
+        isVirtual = ev.target.checked;
+        updateDOM();
+    });
+
+    const selectTe = document.getElementById("te");
+    selectTe.addEventListener("change", (ev) => {
+        te = parseInt(ev.target.value);
+        updateDOM();
+    })
+
+
+    let users;
+    let solves;
     Promise.all([
         fetch("./solves.json").then(res => res.json()),
         fetch("./users.json").then(res => res.json())
@@ -17,28 +50,47 @@
             })
     ])
         .then(json => {
-            const solves = json[0];
-            const users = json[1];
+            solves = json[0];
+            users = json[1];
             const timestamp = document.createElement("h1");
             timestamp.innerText = solves.updated_at;
             document.body.append(timestamp);
 
-            const data = document.createElement("div");
-            for (const datum of solves.solves) {
-                const header = document.createElement("h3");
-                header.innerText = `@${users[datum.author_id].username} ${datum.te}te virtual(${datum.is_virtual}) ${datum.time}`;
-                data.append(header);
-                const comment = document.createElement("div");
-                comment.innerText = `${datum.scramble}\n${datum.comment}`;
-                data.append(comment);
-            }
-            document.body.append(data);
+            updateDOM();
         })
         .catch(e => {
             const error = document.createElement("span");
             error.innerText = e.message;
             document.body.append(error);
         });
+
+    function updateDOM() {
+        console.log({isVirtual, te});
+
+        let container = document.getElementById("solves");
+        if (!container) {
+            container = document.createElement("div");
+            container.id = "solves";
+            document.body.append(container);
+        }
+
+        while (container.firstChild) {
+            container.removeChild(container.lastChild);
+        }
+
+        solves.solves
+            .filter(datum => datum.te === te && datum.is_virtual === isVirtual)
+            .forEach(datum => {
+                const div = document.createElement("div");
+                const header = document.createElement("h3");
+                header.innerText = `@${users[datum.author_id].username} ${datum.te}te virtual(${datum.is_virtual}) ${datum.time}`;
+                div.append(header);
+                const comment = document.createElement("div");
+                comment.innerText = `${datum.scramble}\n${datum.comment}`;
+                div.append(comment);
+                container.append(div);
+            });
+    }
 </script>
 
 </body>
