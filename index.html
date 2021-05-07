@@ -47,13 +47,15 @@
                     acc[u.id] = u;
                     return acc;
                 }, {})
-            })
+            }),
+        fetch("./updated_at").then(res => res.text())
     ])
         .then(json => {
             solves = json[0];
             users = json[1];
+            const updated_at = json[2]
             const timestamp = document.createElement("h1");
-            timestamp.innerText = solves.updated_at;
+            timestamp.innerText = updated_at;
             document.body.append(timestamp);
 
             updateDOM();

@@ -2,5 +2,6 @@
 
 ## update data
 ```shell
-deno run --allow-net --allow-read --allow-write update-data.ts
+export TWITTER_BEARER_TOKEN="your twitter bearer token"
+deno run --allow-net --allow-read --allow-write --allow-env update-data.ts
 ```
