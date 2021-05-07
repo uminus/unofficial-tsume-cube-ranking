@@ -1,6 +1,6 @@
 import {Res} from "./model.ts"
 
-const token = "AAAAAAAAAAAAAAAAAAAAACXsPAEAAAAA5D0PiHG5l66SlNGe1sR%2Fc3faxLM%3DUtCjfLsvtUD6oyWHJHatvNGzfYmVawgWhXTMU4sseaPSfutgEh";
+const token = Deno.env.get("TWITTER_BEARER_TOKEN");
 const query = encodeURIComponent("詰めキューブ");
 
 export async function fetchTweets(lastUpdatedAt: string, nextToken?: string): Promise<Res> {
