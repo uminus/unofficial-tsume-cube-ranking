@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>GitHub Pages</title>
+</head>
+<body>
+<script>
+    Promise.all([
+        fetch("./solves.json").then(res => res.json()),
+        fetch("./users.json").then(res => res.json())
+            .then(json => {
+                return json.users.reduce((acc, u) => {
+                    acc[u.id] = u;
+                    return acc;
+                }, {})
+            })
+    ])
+        .then(json => {
+            const solves = json[0];
+            const users = json[1];
+            const timestamp = document.createElement("h1");
+            timestamp.innerText = solves.updated_at;
+            document.body.append(timestamp);
+
+            const data = document.createElement("div");
+            for (const datum of solves.solves) {
+                const header = document.createElement("h3");
+                header.innerText = `@${users[datum.author_id].username} ${datum.te}te virtual(${datum.is_virtual}) ${datum.time}`;
+                data.append(header);
+                const comment = document.createElement("div");
+                comment.innerText = `${datum.scramble}\n${datum.comment}`;
+                data.append(comment);
+            }
+            document.body.append(data);
+        })
+        .catch(e => {
+            const error = document.createElement("span");
+            error.innerText = e.message;
+            document.body.append(error);
+        });
+</script>
+
+</body>
+</html>
