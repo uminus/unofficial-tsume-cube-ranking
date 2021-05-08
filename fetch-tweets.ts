@@ -8,7 +8,7 @@ export async function fetchTweets(lastUpdatedAt: string, nextToken?: string): Pr
   startTime.setMilliseconds(0);
   startTime.setSeconds(0);
 
-  const url = `https://api.twitter.com/2/tweets/search/recent?query=${query}&max_results=100&tweet.fields=created_at&expansions=author_id&user.fields=profile_image_url&start_time=${startTime.toISOString()}${nextToken ? `&next_token=${nextToken}` : ""}`
+  const url = `https://api.twitter.com/2/tweets/search/recent?query=${query}&max_results=100&tweet.fields=created_at,referenced_tweets&expansions=author_id&user.fields=profile_image_url&start_time=${startTime.toISOString()}${nextToken ? `&next_token=${nextToken}` : ""}`
   const res = await fetch(url, {
     headers: [["Authorization", `Bearer ${token}`]]
   });
