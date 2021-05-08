@@ -12,7 +12,7 @@ function ignoreTweet(t: Tweet): boolean {
 }
 
 const tweets = await fetchTweets(lastUpdatedAt);
-const regex = /(?<comment1>[\s\S]*)(?<te>\d+)手の(?<is_virtual>バーチャル)?詰めキューブを(?<is_only_scramble_image>.*スクランブル画像のみで)?(?<time>(\d+:)?\d*\.\d*)で[\s\S]*解いた問題: (?<scramble>[UDFBLR' 2]*)[\s\S]*(#詰めキューブ)?(?<comment2>[\s\S]*)/;
+const regex = /(?<comment1>[\s\S]*)(?<te>\d+)手の(?<is_virtual>バーチャル)?詰めキューブを(?<is_only_scramble_image>.*スクランブル画像のみで)?(?<time>(\d+:)?\d*\.\d*)で[\s\S]*解いた問題: (?<scramble>[UDFBLR' 2]*)[\s\S]*(#詰めキューブ)(?<comment2>[\s\S]*)/;
 const solves = (tweets.data || [])
   .filter(ignoreTweet)
   .map(t => {
