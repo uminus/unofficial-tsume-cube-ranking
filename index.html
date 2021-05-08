@@ -18,6 +18,10 @@
           text-decoration: none;
           color: #212529;
       }
+
+      .tiny {
+          font-size: .65em;
+      }
   </style>
 </head>
 <body>
@@ -161,10 +165,10 @@
                 card.append(cardBody);
 
                 const cardTitle = document.createElement("h5");
-                cardTitle.className = "card-title";
+                cardTitle.className = "card-title row";
 
                 const linkTweet = document.createElement("a");
-                linkTweet.className = "link__tweet";
+                linkTweet.className = "link__tweet col";
                 linkTweet.href = `https://twitter.com/${user.username}/status/${datum.tweet}`;
                 linkTweet.target = `_blank`;
                 cardTitle.append(linkTweet);
@@ -181,29 +185,38 @@
 
                 if (timestamp > freshnessThreshold) {
                     const badgeFreshness = document.createElement("span");
-                    badgeFreshness.className = "badge bg-success";
+                    badgeFreshness.className = "badge bg-danger";
                     badgeFreshness.textContent = "New";
-                    cardTitle.append(badgeFreshness);
+                    linkTweet.append(badgeFreshness);
                 }
+
+                const badges = document.createElement("div");
+                badges.className = "col text-end";
+                cardTitle.append(badges);
 
                 const badgeTe = document.createElement("span");
                 badgeTe.className = "badge bg-primary";
                 badgeTe.textContent = "" + datum.te;
-                cardTitle.append(badgeTe);
+                badges.append(badgeTe);
 
                 if (datum.is_virtual) {
                     const badgeVirtual = document.createElement("span");
                     badgeVirtual.className = "badge bg-success";
                     badgeVirtual.textContent = "Virtual";
-                    cardTitle.append(badgeVirtual);
+                    badges.append(badgeVirtual);
                 }
 
                 if (datum.is_only_scramble_image) {
                     const badgeOnlyImage = document.createElement("span");
                     badgeOnlyImage.className = "badge bg-info";
                     badgeOnlyImage.textContent = "Only Image";
-                    cardTitle.append(badgeOnlyImage);
+                    badges.append(badgeOnlyImage);
                 }
+
+                const timestampSpan = document.createElement("span");
+                timestampSpan.className = "tiny text-muted text-end";
+                timestampSpan.textContent = toDateTimeString(timestamp);
+                badges.append(timestampSpan);
 
                 const cardSubTitle = document.createElement("h6");
                 cardSubTitle.className = "card-subtitle mb-2";
@@ -222,6 +235,10 @@
 
                 container.append(fragment);
             });
+    }
+
+    function toDateTimeString(d) {
+        return `${d.getFullYear()}/${("0" + (d.getMonth() + 1)).slice(-2)}/${("0" + d.getDate()).slice(-2)} ${("0" + d.getHours()).slice(-2)}:${("0" + d.getMinutes()).slice(-2)}`;
     }
 </script>
 </body>
