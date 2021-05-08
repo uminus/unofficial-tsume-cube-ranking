@@ -16,6 +16,12 @@ export interface Tweet {
   author_id: string;
   text: string;
   created_at: string;
+  referenced_tweets?: Array<ReferencedTweet>;
+}
+
+export interface ReferencedTweet {
+  id: string;
+  type: "retweeted" | "quoted" | "replied_to";
 }
 
 export interface User {

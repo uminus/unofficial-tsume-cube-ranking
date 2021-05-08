@@ -7,10 +7,14 @@ const timestamp = new Date().toISOString();
 
 const lastUpdatedAt = await Deno.readTextFile("./updated_at") as string;
 
+function ignoreTweet(t: Tweet): boolean {
+  return !(t.referenced_tweets || []).find(r => r.type === "retweeted") && regex.test(t.text);
+}
+
 const tweets = await fetchTweets(lastUpdatedAt);
 const regex = /(?<comment1>[\s\S]*)(?<te>\d+)手の(?<is_virtual>バーチャル)?詰めキューブを(?<time>(\d+:)?\d*\.\d*)で[\s\S]*解いた問題: (?<scramble>[UDFBLR' 2]*)[\s\S]*(#詰めキューブ)?(?<comment2>[\s\S]*)/;
 const solves = (tweets.data || [])
-  .filter(t => regex.test(t.text))
+  .filter(ignoreTweet)
   .map(t => {
     const g = t.text.match(regex)!.groups!;
     return {
@@ -38,7 +42,7 @@ prevUsers.users.push(...(tweets.includes?.users || []));
 Deno.writeTextFileSync("./users.json", JSON.stringify(prevUsers));
 
 const prevErrors: { tweets: Array<Tweet> } = await Deno.readTextFile('./errors.json').then(f => JSON.parse(f));
-prevErrors.tweets.push(...(tweets.data || []).filter(t => !regex.test(t.text)));
+prevErrors.tweets.push(...(tweets.data || []).filter(t => !ignoreTweet(t)));
 Deno.writeTextFileSync("./errors.json", JSON.stringify(prevErrors));
 
 
