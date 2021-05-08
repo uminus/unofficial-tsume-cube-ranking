@@ -36,6 +36,7 @@ export interface Solve {
   author_id: string;
   te: number;
   is_virtual: boolean;
+  is_only_scramble_image: boolean;
   scramble: string;
   time: string;
   time_millis: number;
