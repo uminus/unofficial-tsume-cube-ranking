@@ -3,26 +3,54 @@
 <head>
   <meta charset="UTF-8">
   <title>Unofficial 詰めキューブ Ranking</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+  <style>
+      img {
+          border-radius: 50%;
+      }
+
+      .badge {
+          font-size: 0.8rem;
+      }
+  </style>
 </head>
 <body>
-<h1>Unofficial 詰めキューブ Ranking</h1>
+<main class="container">
+  <h1>Unofficial 詰めキューブ Ranking</h1>
 
-<label for="is_virtual">Virtual Mode</label>
-<input type="checkbox" id="is_virtual" name="is_virtual" />
-<br />
-<label>手数
-  <select id="te" name="te">
-    <option value="4">4手</option>
-    <option value="5">5手</option>
-    <option value="6">6手</option>
-    <option value="7">7手</option>
-    <option value="8" selected>8手</option>
-  </select>
-</label>
+  <form class="row g-2">
+    <div class="col-auto row g-2">
+      <select id="te" class="form-select" autocomplete="off">
+        <option value="-1" selected>すべて</option>
+        <option value="4">4手</option>
+        <option value="5">5手</option>
+        <option value="6">6手</option>
+        <option value="7">7手</option>
+        <option value="8">8手</option>
+      </select>
+    </div>
+    <div class="col-auto" style="padding-top: 12px;">
+      <input class="form-check-input" type="checkbox" value="" id="is_virtual" autocomplete="off">
+      <label class="form-check-label" for="is_virtual"> Virtual Mode</label>
+    </div>
+  </form>
 
+  <section id="list" class="container"></section>
+</main>
+<footer class="footer mt-auto py-3 bg-light fixed-bottom ">
+  <div class="container">
+    <div class="row">
+      <a class="btn btn-outline-primary col-4" href="https://uesyuu.github.io/tsume_cube/">詰めキューブ(@uesyuu_cube)</a>
+      <p id="updated_at" class="col-8 text-muted fs-6 text-end">ranking updated at:</p>
+    </div>
+  </div>
+</footer>
 <script>
+    const regexTime = /((?<m>\d+):)?(?<s>\d+)\.(?<ms>\d+)/;
+
     let isVirtual = false;
-    let te = 8;
+    let te = -1;
 
     const checkboxIsVirtual = document.getElementById("is_virtual");
     checkboxIsVirtual.addEventListener("change", (ev) => {
@@ -34,7 +62,7 @@
     selectTe.addEventListener("change", (ev) => {
         te = parseInt(ev.target.value);
         updateDOM();
-    })
+    });
 
 
     let users;
@@ -54,9 +82,8 @@
             solves = json[0];
             users = json[1];
             const updated_at = json[2]
-            const timestamp = document.createElement("h1");
-            timestamp.innerText = updated_at;
-            document.body.append(timestamp);
+            const timestamp = document.getElementById("updated_at");
+            timestamp.innerText = `updated at: ${updated_at}`;
 
             updateDOM();
         })
@@ -73,7 +100,7 @@
         if (!container) {
             container = document.createElement("div");
             container.id = "solves";
-            document.body.append(container);
+            document.getElementById("list").append(container);
         }
 
         while (container.firstChild) {
@@ -81,19 +108,64 @@
         }
 
         solves.solves
-            .filter(datum => datum.te === te && datum.is_virtual === isVirtual)
-            .forEach(datum => {
-                const div = document.createElement("div");
-                const header = document.createElement("h3");
-                header.innerText = `@${users[datum.author_id].username} ${datum.te}te virtual(${datum.is_virtual}) ${datum.time}`;
-                div.append(header);
-                const comment = document.createElement("div");
-                comment.innerText = `${datum.scramble}\n${datum.comment}`;
-                div.append(comment);
-                container.append(div);
+            .filter(datum => (datum.te === te || te === -1) && datum.is_virtual === isVirtual)
+            .map(datum => {
+                if (!datum.time_millis) {
+                    const t = datum.time.match(regexTime).groups;
+                    datum.time_millis = parseInt(t.m || 0) * 60000 + parseInt(t.s) * 1000 + parseInt(t.ms);
+                }
+                return datum;
+            })
+            .sort((a, b) => a.time_millis - b.time_millis)
+            .forEach((datum, i) => {
+                const user = users[datum.author_id];
+                const fragment = document.createDocumentFragment();
+                const card = document.createElement("div");
+                card.className = "card";
+                fragment.append(card);
+
+                const cardBody = document.createElement("div");
+                cardBody.className = "card-body";
+                card.append(cardBody);
+
+                const cardTitle = document.createElement("h5");
+                cardTitle.className = "card-title";
+
+                const userIcon = document.createElement("img");
+                userIcon.src = user.profile_image_url;
+                cardTitle.append(userIcon);
+
+                const userName = document.createElement("span");
+                userName.textContent = `${user.name} ${datum.time}`;
+                userName.style.paddingLeft = "8px";
+                cardTitle.append(userName);
+                cardBody.append(cardTitle);
+
+                const badgeTe = document.createElement("span");
+                badgeTe.className = "badge bg-primary";
+                badgeTe.textContent = "" + datum.te;
+                cardTitle.append(badgeTe);
+
+                if (datum.is_virtual) {
+                    const badgeVirtual = document.createElement("span");
+                    badgeVirtual.className = "badge bg-success";
+                    badgeVirtual.textContent = "Virtual";
+                    cardTitle.append(badgeVirtual);
+                }
+
+                const cardSubTitle = document.createElement("h6");
+                cardSubTitle.className = "card-subtitle mb-2 text-muted";
+                cardSubTitle.textContent = `@${user.username}`;
+                cardBody.append(cardSubTitle);
+
+                const cardText = document.createElement("p");
+                cardText.className = "card-text";
+                cardText.textContent = datum.comment;
+                cardBody.append(cardText);
+
+                container.append(fragment);
             });
     }
 </script>
-
 </body>
 </html>
