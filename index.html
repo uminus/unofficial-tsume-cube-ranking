@@ -178,6 +178,13 @@
                     cardTitle.append(badgeVirtual);
                 }
 
+                if (datum.is_only_scramble_image) {
+                    const badgeOnlyImage = document.createElement("span");
+                    badgeOnlyImage.className = "badge bg-info";
+                    badgeOnlyImage.textContent = "Only Image";
+                    cardTitle.append(badgeOnlyImage);
+                }
+
                 const cardSubTitle = document.createElement("h6");
                 cardSubTitle.className = "card-subtitle mb-2 text-muted";
                 cardSubTitle.textContent = `@${user.username}`;
