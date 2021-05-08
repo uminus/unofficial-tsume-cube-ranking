@@ -63,6 +63,7 @@
 </footer>
 <script>
     const regexTime = /((?<m>\d+):)?(?<s>\d+)\.(?<ms>\d+)/;
+    const freshnessThreshold = new Date().getTime() - 24 * 60 * 60 * 1000;
 
     let mode = "normal";
     let te = -1;
@@ -143,6 +144,7 @@
             })
             .sort((a, b) => a.time_millis - b.time_millis)
             .forEach((datum, i) => {
+                const timestamp = new Date(datum.timestamp);
                 const user = users[datum.author_id];
                 const fragment = document.createDocumentFragment();
                 const card = document.createElement("div");
@@ -165,6 +167,13 @@
                 userName.style.paddingLeft = "8px";
                 cardTitle.append(userName);
                 cardBody.append(cardTitle);
+
+                if (timestamp > freshnessThreshold) {
+                    const badgeFreshness = document.createElement("span");
+                    badgeFreshness.className = "badge bg-success";
+                    badgeFreshness.textContent = "New";
+                    cardTitle.append(badgeFreshness);
+                }
 
                 const badgeTe = document.createElement("span");
                 badgeTe.className = "badge bg-primary";
