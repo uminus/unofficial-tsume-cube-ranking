@@ -13,6 +13,11 @@
       .badge {
           font-size: 0.8rem;
       }
+
+      .link__tweet {
+          text-decoration: none;
+          color: #212529;
+      }
   </style>
 </head>
 <body>
@@ -158,14 +163,20 @@
                 const cardTitle = document.createElement("h5");
                 cardTitle.className = "card-title";
 
+                const linkTweet = document.createElement("a");
+                linkTweet.className = "link__tweet";
+                linkTweet.href = `https://twitter.com/${user.username}/status/${datum.tweet}`;
+                linkTweet.target = `_blank`;
+                cardTitle.append(linkTweet);
+
                 const userIcon = document.createElement("img");
                 userIcon.src = user.profile_image_url;
-                cardTitle.append(userIcon);
+                linkTweet.append(userIcon);
 
                 const userName = document.createElement("span");
                 userName.textContent = `${user.name} ${datum.time}`;
                 userName.style.paddingLeft = "8px";
-                cardTitle.append(userName);
+                linkTweet.append(userName);
                 cardBody.append(cardTitle);
 
                 if (timestamp > freshnessThreshold) {
@@ -195,8 +206,13 @@
                 }
 
                 const cardSubTitle = document.createElement("h6");
-                cardSubTitle.className = "card-subtitle mb-2 text-muted";
-                cardSubTitle.textContent = `@${user.username}`;
+                cardSubTitle.className = "card-subtitle mb-2";
+                const linkUser = document.createElement("a");
+                linkUser.className = "text-muted";
+                linkUser.href = `https://twitter.com/${user.username}`;
+                linkUser.target = `_blank`;
+                linkUser.textContent = `@${user.username}`;
+                cardSubTitle.append(linkUser);
                 cardBody.append(cardSubTitle);
 
                 const cardText = document.createElement("p");
